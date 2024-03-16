@@ -19,6 +19,9 @@ public class OrbitCamera : MonoBehaviour
 
     [SerializeField, Range(0f, 90f)] private float alignSmoothRange;
 
+    [Header("Obstruction")]
+    [SerializeField] private LayerMask obstructionMask;
+
     private Vector3 focusPoint, previousFocusPoint;
 
     private Vector2 orbitAngles = new Vector2(45f, 0f);
@@ -64,7 +67,7 @@ public class OrbitCamera : MonoBehaviour
         float castDistance = castLine.magnitude;
         Vector3 castDirection = castLine / castDistance;
 
-        if (Physics.BoxCast(castFrom, CameraHalfExtends, castDirection, out RaycastHit hit, lookRotation, castDistance))
+        if (Physics.BoxCast(castFrom, CameraHalfExtends, castDirection, out RaycastHit hit, lookRotation, castDistance, obstructionMask))
         {
             rectPosition = castFrom + castDirection * hit.distance;
             lookPosition = rectPosition - rectOffset;
