@@ -128,6 +128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc03f28523fdaf94fbbeb07fc1cef866, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerInputSpace: {fileID: 0}
   maxSpeed: 10
   maxAcceleration: 20
   maxAirAcceleration: 5
@@ -136,7 +137,7 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxSnapSpeed: 100
-  probeDistance: 15.85
+  probeDistance: 1.3
   probeMask:
     serializedVersion: 2
     m_Bits: 1075
