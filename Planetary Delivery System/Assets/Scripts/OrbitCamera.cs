@@ -22,6 +22,9 @@ public class OrbitCamera : MonoBehaviour
     [Header("Obstruction")]
     [SerializeField] private LayerMask obstructionMask;
 
+    [Header("Gravity Flip")]
+    [SerializeField, Min(0f)] private float upAlignmentSpeed;
+
     private Vector3 focusPoint, previousFocusPoint;
 
     private Vector2 orbitAngles = new Vector2(45f, 0f);
@@ -50,8 +53,7 @@ public class OrbitCamera : MonoBehaviour
 
     private void LateUpdate()
     {
-        gravityAlignment =
-            Quaternion.FromToRotation(gravityAlignment * Vector3.up, CustomGravity.GetUpAxis(focusPoint)) * gravityAlignment;
+        UpdateGravityAlignment();
 
         UpdateFocusPoint();
         if(ManualRotation() || AutomaticRotation())
@@ -185,6 +187,25 @@ public class OrbitCamera : MonoBehaviour
             halfExtends.x = halfExtends.y * regularCamera.aspect;
             halfExtends.z = 0f;
             return halfExtends;
+        }
+    }
+
+    private void UpdateGravityAlignment()
+    {
+        Vector3 fromUp = gravityAlignment * Vector3.up;
+        Vector3 toUp = CustomGravity.GetUpAxis(focusPoint);
+        float dot = Mathf.Clamp(Vector3.Dot(fromUp, toUp), -1f, 1f);
+        float angle = Mathf.Acos(dot) * Mathf.Rad2Deg;
+        float maxAngle = upAlignmentSpeed * Time.deltaTime;
+
+        Quaternion newAlignment = Quaternion.FromToRotation(fromUp, toUp) * gravityAlignment;
+        if (angle <= maxAngle)
+        {
+            gravityAlignment = newAlignment;
+        }
+        else
+        {
+            gravityAlignment = Quaternion.SlerpUnclamped(gravityAlignment, newAlignment, maxAngle / angle);
         }
     }
 }
