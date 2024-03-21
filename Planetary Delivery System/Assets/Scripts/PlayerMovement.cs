@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.UI.Image;
@@ -21,6 +22,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField, Range(0f, 100f)] private float maxSnapSpeed;
     [SerializeField, Min(0f)] private float probeDistance;
     [SerializeField] private LayerMask probeMask, stairsMask;
+
+    [Header("References")]
+    [SerializeField] private Transform holdLocation;
 
     Rigidbody body;
 
@@ -45,6 +49,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 upAxis, rightAxis, forwardAxis;
 
     private Vector3 capsuleDirection;
+
+    private Vector3 walkingSpeed;
 
     void OnValidate()
     {
@@ -101,8 +107,11 @@ public class PlayerMovement : MonoBehaviour
         ClearState();
 
         //rotate capule to gravity direction
-        capsuleDirection = Vector3.Lerp(capsuleDirection, upAxis, 0.2f);
+        capsuleDirection = Vector3.Lerp(capsuleDirection, upAxis, 0.1f);
         transform.up = capsuleDirection;
+
+        //rotate capule to look direction
+
     }
 
     void ClearState()
@@ -202,6 +211,7 @@ public class PlayerMovement : MonoBehaviour
             Mathf.MoveTowards(currentZ, desiredVelocity.z, maxSpeedChange);
 
         velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
+        walkingSpeed = xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
     }
 
     void Jump(Vector3 gravity)

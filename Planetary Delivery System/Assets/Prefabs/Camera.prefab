@@ -224,7 +224,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   focus: {fileID: 0}
-  distance: 5
+  distance: 7
   focusRadius: 0.25
   focusCentering: 0.5
   rotationSpeed: 90
@@ -235,3 +235,4 @@ MonoBehaviour:
   obstructionMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  upAlignmentSpeed: 360
