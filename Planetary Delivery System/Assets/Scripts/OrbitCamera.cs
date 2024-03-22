@@ -29,12 +29,14 @@ public class OrbitCamera : MonoBehaviour
 
     private Vector2 orbitAngles = new Vector2(45f, 0f);
 
-    float lastManualRotationTime;
+    private float lastManualRotationTime;
 
-    Camera regularCamera;
+    private Camera regularCamera;
 
-    Quaternion gravityAlignment = Quaternion.identity;
-    Quaternion orbitRotation;
+    private Quaternion gravityAlignment = Quaternion.identity;
+    private Quaternion orbitRotation;
+
+    private Transform restrainedPosition;
 
     void OnValidate()
     {
@@ -56,31 +58,8 @@ public class OrbitCamera : MonoBehaviour
         UpdateGravityAlignment();
 
         UpdateFocusPoint();
-        if(ManualRotation() || AutomaticRotation())
-        {
-            ConstrainAngles();
-            orbitRotation = Quaternion.Euler(orbitAngles);
-        } 
 
-        Quaternion lookRotation = gravityAlignment * orbitRotation;
-
-        Vector3 lookDirection = lookRotation * Vector3.forward;
-        Vector3 lookPosition = focusPoint - lookDirection * distance;
-
-        Vector3 rectOffset = lookDirection * regularCamera.nearClipPlane;
-        Vector3 rectPosition = lookPosition + rectOffset;
-        Vector3 castFrom = focus.position;
-        Vector3 castLine = rectPosition - castFrom;
-        float castDistance = castLine.magnitude;
-        Vector3 castDirection = castLine / castDistance;
-
-        if (Physics.BoxCast(castFrom, CameraHalfExtends, castDirection, out RaycastHit hit, lookRotation, castDistance, obstructionMask))
-        {
-            rectPosition = castFrom + castDirection * hit.distance;
-            lookPosition = rectPosition - rectOffset;
-        }
-
-        transform.SetPositionAndRotation(lookPosition, lookRotation);
+        RotateAndMoveCamera();
     }
 
     private void UpdateFocusPoint()
@@ -207,5 +186,34 @@ public class OrbitCamera : MonoBehaviour
         {
             gravityAlignment = Quaternion.SlerpUnclamped(gravityAlignment, newAlignment, maxAngle / angle);
         }
+    }
+
+    private void RotateAndMoveCamera()
+    {
+        if (ManualRotation() || AutomaticRotation())
+        {
+            ConstrainAngles();
+            orbitRotation = Quaternion.Euler(orbitAngles);
+        }
+
+        Quaternion lookRotation = gravityAlignment * orbitRotation;
+
+        Vector3 lookDirection = lookRotation * Vector3.forward;
+        Vector3 lookPosition = focusPoint - lookDirection * distance;
+
+        Vector3 rectOffset = lookDirection * regularCamera.nearClipPlane;
+        Vector3 rectPosition = lookPosition + rectOffset;
+        Vector3 castFrom = focus.position;
+        Vector3 castLine = rectPosition - castFrom;
+        float castDistance = castLine.magnitude;
+        Vector3 castDirection = castLine / castDistance;
+
+        if (Physics.BoxCast(castFrom, CameraHalfExtends, castDirection, out RaycastHit hit, lookRotation, castDistance, obstructionMask))
+        {
+            rectPosition = castFrom + castDirection * hit.distance;
+            lookPosition = rectPosition - rectOffset;
+        }
+
+        transform.SetPositionAndRotation(lookPosition, lookRotation);
     }
 }

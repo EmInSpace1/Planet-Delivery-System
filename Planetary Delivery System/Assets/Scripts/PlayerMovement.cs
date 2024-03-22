@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Runtime.CompilerServices;
+using Unity.PlasticSCM.Editor.WebApi;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.UI.Image;
@@ -24,6 +25,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LayerMask probeMask, stairsMask;
 
     [Header("References")]
+    [SerializeField] private OrbitCamera orbitCamera;
     [SerializeField] private Transform holdLocation;
 
     Rigidbody body;
@@ -50,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 capsuleDirection;
 
-    private Vector3 walkingSpeed;
+    private Vector3 walkingDir;
 
     void OnValidate()
     {
@@ -62,6 +64,7 @@ public class PlayerMovement : MonoBehaviour
     {
         body = GetComponent<Rigidbody>();
         body.useGravity = false;
+
         OnValidate();
     }
 
@@ -86,6 +89,8 @@ public class PlayerMovement : MonoBehaviour
         desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
 
         desiredJump |= Input.GetButtonDown("Jump");
+
+        walkingDir = new Vector3(playerInput.x, 0, playerInput.y);
     }
 
     void FixedUpdate()
@@ -106,12 +111,16 @@ public class PlayerMovement : MonoBehaviour
         body.velocity = velocity;
         ClearState();
 
+
+
         //rotate capule to gravity direction
-        capsuleDirection = Vector3.Lerp(capsuleDirection, upAxis, 0.1f);
+        Vector3 currentUp = upAxis;
+        capsuleDirection = Vector3.Lerp(capsuleDirection, currentUp, 0.1f);
         transform.up = capsuleDirection;
 
-        //rotate capule to look direction
-
+        //place the holding object at the correct location
+        Vector3 cameraDirection = transform.position - playerInputSpace.position;
+        holdLocation.position = cameraDirection/9 + transform.position;
     }
 
     void ClearState()
@@ -211,7 +220,7 @@ public class PlayerMovement : MonoBehaviour
             Mathf.MoveTowards(currentZ, desiredVelocity.z, maxSpeedChange);
 
         velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
-        walkingSpeed = xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
+        walkingDir = xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
     }
 
     void Jump(Vector3 gravity)
