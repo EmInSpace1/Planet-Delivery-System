@@ -300,4 +300,10 @@ public class PlayerMovement : MonoBehaviour
         return (stairsMask & (1 << layer)) == 0 ?
             minGroundDotProduct : minStairsDotProduct;
     }
+
+    public Vector3 GetPackageDirection()
+    {
+        Vector3 cameraDirection = transform.position - playerInputSpace.position;
+        return cameraDirection;
+    }
 }
