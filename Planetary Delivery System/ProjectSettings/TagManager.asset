@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Planet
   - PackageHolder
+  - LevelEnd
+  - Package
   layers:
   - Default
   - TransparentFX

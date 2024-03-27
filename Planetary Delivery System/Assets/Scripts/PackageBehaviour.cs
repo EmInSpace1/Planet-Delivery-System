@@ -18,6 +18,8 @@ public class PackageBehaviour : MonoBehaviour
 
     private bool playerClose;
 
+    private bool canFinish;
+
     private void Awake()
     {
         packageHolder = GameObject.FindGameObjectWithTag("PackageHolder").transform;
@@ -74,6 +76,24 @@ public class PackageBehaviour : MonoBehaviour
         if (other.gameObject.tag == "Player")
         {
             playerClose = true;
-        }
+
+            if (!pickedUp)
+            {
+                canFinish = true;
+            } else canFinish = false;
+        } else canFinish = false;
+    }
+
+    public bool GetIsPickedUp()
+    {
+        return pickedUp;
+    }
+
+    public bool FinishConditionsMet()
+    {
+        if (playerClose && !pickedUp)
+        {
+            return true;
+        } else return false;
     }
 }

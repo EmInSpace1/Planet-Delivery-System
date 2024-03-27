@@ -27,6 +27,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("References")]
     [SerializeField] private OrbitCamera orbitCamera;
     [SerializeField] private Transform holdLocation;
+    [SerializeField] private PackageBehaviour package;
 
     Rigidbody body;
 
@@ -53,6 +54,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 capsuleDirection;
 
     private Vector3 walkingDir;
+
+    private bool holdingPackage;
 
     void OnValidate()
     {
@@ -103,7 +106,7 @@ public class PlayerMovement : MonoBehaviour
         if (desiredJump)
         {
             desiredJump = false;
-            Jump(gravity);
+            if(!package.GetIsPickedUp()) Jump(gravity);
         }
 
         velocity += gravity * Time.deltaTime;
@@ -305,5 +308,10 @@ public class PlayerMovement : MonoBehaviour
     {
         Vector3 cameraDirection = transform.position - playerInputSpace.position;
         return cameraDirection;
+    }
+
+    public void SetHoldingPackage(bool newValue)
+    {
+        holdingPackage = newValue;
     }
 }
