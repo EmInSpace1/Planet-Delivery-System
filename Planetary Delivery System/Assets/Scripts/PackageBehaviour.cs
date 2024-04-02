@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class PackageBehaviour : MonoBehaviour
 {
     [SerializeField] private PlayerMovement player;
+    [SerializeField] private GameObject pickUpText;
+    [SerializeField] private GameObject throwText;
 
     private bool pickedUp;
     private bool justDropped;
@@ -30,15 +33,18 @@ public class PackageBehaviour : MonoBehaviour
 
     private void Update()
     {
-            if(playerClose && Input.GetButtonDown("Interact") && !pickedUp && !justDropped)
-            {
-                pickedUp = true;
+        if(playerClose && Input.GetButtonDown("Interact") && !pickedUp && !justDropped)
+        {
+            pickedUp = true;
 
-                gravityBody.enabled = false;
-                coll.enabled = false;
+            gravityBody.enabled = false;
+            coll.enabled = false;
 
-                justPickedUp = true;
-            }
+            justPickedUp = true;
+
+            pickUpText.SetActive(false);
+            throwText.SetActive(true);
+        }
 
         justDropped = false;
         if(pickedUp)
@@ -46,13 +52,14 @@ public class PackageBehaviour : MonoBehaviour
             transform.position = packageHolder.position;
             transform.rotation = packageHolder.rotation;
 
-            if(Input.GetButtonDown("Interact") && !justPickedUp)
+            if((Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.Q)) && !justPickedUp)
             {
                 pickedUp = false;
 
                 gravityBody.enabled = true;
                 coll.enabled = true;
                 justDropped = true;
+                throwText.SetActive(false);
             }
         }
 
@@ -65,10 +72,10 @@ public class PackageBehaviour : MonoBehaviour
             coll.enabled = true;
             justDropped = true;
             body.AddForce(player.GetPackageDirection()*200);
+            throwText.SetActive(false);
         }
 
         justPickedUp = false;
-        playerClose = false;
     }
 
     private void OnTriggerStay(Collider other)
@@ -80,8 +87,20 @@ public class PackageBehaviour : MonoBehaviour
             if (!pickedUp)
             {
                 canFinish = true;
-            } else canFinish = false;
-        } else canFinish = false;
+                pickUpText.SetActive(true);
+            }
+            else canFinish = false;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+            playerClose = false;
+            canFinish = false;
+            pickUpText.SetActive(false);
+        }
     }
 
     public bool GetIsPickedUp()
@@ -93,6 +112,7 @@ public class PackageBehaviour : MonoBehaviour
     {
         if (playerClose && !pickedUp)
         {
+            pickUpText.SetActive(false);
             return true;
         } else return false;
     }

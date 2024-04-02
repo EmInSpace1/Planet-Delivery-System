@@ -30,6 +30,9 @@ public class EndLevelScript : MonoBehaviour
                 levelFinishMenu.SetActive(true);
                 endLevelTime.text = string.Format("{0:00}:{1:00}", (int)levelTimer / 60, (int)levelTimer % 60);
                 levelPoints.text = ((int)(200 - levelTimer)).ToString();
+
+                int currentPoints = PlayerPrefs.GetInt("Points");
+                PlayerPrefs.SetInt("Points", (int)(200 - levelTimer) + currentPoints);
             }
         }
     }
